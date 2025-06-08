@@ -23,16 +23,31 @@ addInputBtn.addEventListener("click", () => {
     addInputBtn.disabled = false;
   }
 
+  const inputWrapper = document.createElement("div");
+  inputWrapper.className = "d-flex align-items-center gap-2 mb-2";
+
   const input = document.createElement("input");
   input.type = "number";
-  input.className = "form-control mb-2 inputNumbers";
+  input.className = "form-control inputNumbers";
   input.placeholder = `Введіть число`;
-  input.id = ``;
   input.value = "";
-  inputWithNumbers.appendChild(input);
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.type = "button";
+  deleteBtn.className = "btn btn-s btn-danger";
+  deleteBtn.innerText = "🗑️";
+
+  deleteBtn.addEventListener("click", () => {
+    inputWrapper.remove();
+  });
+
+  inputWrapper.appendChild(input);
+  inputWrapper.appendChild(deleteBtn);
+
+  inputWithNumbers.appendChild(inputWrapper);
 
   idCounter++;
-  input.placeholder = `Введите ${idCounter} число`;
+  input.placeholder = `Введіть ${idCounter} число`;
 });
 
 function calculateSum() {
