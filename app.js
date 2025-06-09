@@ -12,15 +12,12 @@ const modulusBtn = document.getElementById("modulus");
 const continueWithNumberBtn = document.getElementById("continueWithNumber");
 const addInputBtn = document.getElementById("addInput");
 
-let idCounter = 2;
-
 addInputBtn.addEventListener("click", () => {
   const inputs = document.querySelectorAll(".inputNumbers");
 
-  if (inputs.length == 9) {
+  if (inputs.length >= 10) {
     addInputBtn.disabled = true;
-  } else {
-    addInputBtn.disabled = false;
+    return;
   }
 
   const inputWrapper = document.createElement("div");
@@ -29,7 +26,8 @@ addInputBtn.addEventListener("click", () => {
   const input = document.createElement("input");
   input.type = "number";
   input.className = "form-control inputNumbers";
-  input.placeholder = `Введіть число`;
+  const inputNumber = inputs.length + 1;
+  input.placeholder = `Введіть ${inputNumber} число`;
   input.value = "";
 
   const deleteBtn = document.createElement("button");
@@ -39,160 +37,112 @@ addInputBtn.addEventListener("click", () => {
 
   deleteBtn.addEventListener("click", () => {
     inputWrapper.remove();
+    const updatedInputs = document.querySelectorAll(".inputNumbers");
+    if (updatedInputs.length < 10) {
+      addInputBtn.disabled = false;
+    }
+    updatedInputs.forEach((el, index) => {
+      el.placeholder = `Введіть ${index + 1} число`;
+    });
   });
 
   inputWrapper.appendChild(input);
   inputWrapper.appendChild(deleteBtn);
-
   inputWithNumbers.appendChild(inputWrapper);
-
-  idCounter++;
-  input.placeholder = `Введіть ${idCounter} число`;
 });
 
+function getValidValues() {
+  return Array.from(document.querySelectorAll(".inputNumbers"))
+    .map((input) => Number(input.value))
+    .filter((val) => !isNaN(val));
+}
+
 function calculateSum() {
-  const inputFields = document.querySelectorAll(".inputNumbers");
-  let sum = null;
-
-  inputFields.forEach((input) => {
-    const value = Number(input.value);
-    if (!isNaN(value) && input.value !== "") {
-      sum += value;
-    }
-  });
-
-  return sum;
+  return getValidValues().reduce((acc, val) => acc + val, 0);
 }
 
 function minusSum() {
-  const inputFields = document.querySelectorAll(".inputNumbers");
-  let minus = null;
-
-  inputFields.forEach((input) => {
-    const value = Number(input.value);
-    if (!isNaN(value) && input.value !== "") {
-      minus -= value;
-    }
-  });
-
-  return minus;
+  const values = getValidValues();
+  if (values.length === 0) return 0;
+  return values.slice(1).reduce((acc, val) => acc - val, values[0]);
 }
 
 function divideSum() {
-  const inputFields = document.querySelectorAll(".inputNumbers");
-  let divide = null;
+  const values = getValidValues();
+  if (values.length === 0) return 0;
 
-  inputFields.forEach((input) => {
-    const value = Number(input.value);
-    if (!isNaN(value) && input.value !== "") {
-      divide /= value;
-    }
-  });
+  for (let i = 1; i < values.length; i++) {
+    if (values[i] === 0) return;
+  }
 
-  return divide;
+  return values.slice(1).reduce((acc, val) => acc / val, values[0]);
 }
 
 function multiplySum() {
-  const inputFields = document.querySelectorAll(".inputNumbers");
-  let multiply = null;
-
-  inputFields.forEach((input) => {
-    const value = Number(input.value);
-    if (!isNaN(value) && input.value !== "") {
-      multiply *= value;
-    }
-  });
-
-  return multiply;
+  const values = getValidValues();
+  if (values.length === 0) return 0;
+  return values.reduce((acc, val) => acc * val, 1);
 }
 
 function powerSum() {
-  const inputFields = document.querySelectorAll(".inputNumbers");
-  let power = null;
-
-  inputFields.forEach((input) => {
-    const value = Number(input.value);
-    if (!isNaN(value) && input.value !== "") {
-      power **= value;
-    }
-  });
-
-  return power;
+  const values = getValidValues();
+  if (values.length === 0) return 0;
+  return values.slice(1).reduce((acc, val) => acc ** val, values[0]);
 }
 
 function modulusSum() {
-  const inputFields = document.querySelectorAll(".inputNumbers");
-  let modulus = null;
+  const values = getValidValues();
+  if (values.length === 0) return 0;
 
-  inputFields.forEach((input) => {
-    const value = Number(input.value);
-    if (!isNaN(value) && input.value !== "") {
-      modulus %= value;
-    }
-  });
+  for (let i = 1; i < values.length; i++) {
+    if (values[i] === 0) return;
+  }
 
-  return modulus;
+  return values.slice(1).reduce((acc, val) => acc % val, values[0]);
 }
 
 plusBtn.onclick = function () {
-  const sum = calculateSum();
-
-  submitBtn.onclick = function () {
-    resultElement.textContent = sum;
-  };
-
-  continueWithNumberBtn.onclick = function () {
-    input1.value = sum;
-  };
+  const result = calculateSum();
+  submitBtn.onclick = () => (resultElement.textContent = result);
+  continueWithNumberBtn.onclick = () => (input1.value = result);
 };
 
 minusBtn.onclick = function () {
-  const minus = minusSum();
-  submitBtn.onclick = function () {
-    resultElement.textContent = minus;
-  };
-  continueWithNumberBtn.onclick = function () {
-    input1.value = minus;
-  };
+  const result = minusSum();
+  submitBtn.onclick = () => (resultElement.textContent = result);
+  continueWithNumberBtn.onclick = () => (input1.value = result);
 };
 
 divideBtn.onclick = function () {
-  const divide = divideSum();
-  let result = divide.toFixed(2);
-  submitBtn.onclick = function () {
-    resultElement.textContent = result;
+  const result = divideSum();
+  submitBtn.onclick = () => {
+    resultElement.textContent =
+      typeof result === "string"
+        ? result
+        : Number.isInteger(result)
+        ? result
+        : result.toFixed(2);
   };
-  continueWithNumberBtn.onclick = function () {
-    input1.value = result;
+  continueWithNumberBtn.onclick = () => {
+    input1.value = typeof result === "string" ? "" : result;
   };
 };
 
 multiplyBtn.onclick = function () {
-  const multiply = multiplySum();
-  submitBtn.onclick = function () {
-    resultElement.textContent = multiply;
-  };
-  continueWithNumberBtn.onclick = function () {
-    input1.value = multiply;
-  };
+  const result = multiplySum();
+  submitBtn.onclick = () => (resultElement.textContent = result);
+  continueWithNumberBtn.onclick = () => (input1.value = result);
 };
 
 powerBtn.onclick = function () {
-  const power = powerSum();
-  submitBtn.onclick = function () {
-    resultElement.textContent = power;
-  };
-  continueWithNumberBtn.onclick = function () {
-    input1.value = power;
-  };
+  const result = powerSum();
+  submitBtn.onclick = () => (resultElement.textContent = result);
+  continueWithNumberBtn.onclick = () => (input1.value = result);
 };
 
 modulusBtn.onclick = function () {
-  const modulus = modulusSum();
-  submitBtn.onclick = function () {
-    resultElement.textContent = modulus;
-  };
-  continueWithNumberBtn.onclick = function () {
-    input1.value = modulus;
-  };
+  const result = modulusSum();
+  submitBtn.onclick = () => (resultElement.textContent = result);
+  continueWithNumberBtn.onclick = () =>
+    (input1.value = typeof result === "string" ? "" : result);
 };
